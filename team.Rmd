@@ -11,11 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Part 1: Extracting and Loading Data
 ```{r}
-setwd("C:/Users/Kobe/Documents/DS202/ds202_lab3")
+#setwd("C:/Users/Kobe/Documents/DS202/ds202_lab3")
+setwd("C:/Users/bobby/OneDrive/Desktop/DS202/ds202_lab3")
 library(dplyr)
 library(ggplot2)
 library(ggmosaic)
-HAPPY <- readxl::read_xls('C:/Users/Kobe/Documents/DS202/ds202_lab3/GSS.xls')
+#HAPPY <- readxl::read_xls('C:/Users/Kobe/Documents/DS202/ds202_lab3/GSS.xls')
+HAPPY <- readxl::read_xls('C:/Users/bobby/OneDrive/Desktop/DS202/ds202_lab3/ds202_lab3/GSS.xls')
 ```
 
 ## Part 2: Exploration
@@ -93,4 +95,4 @@ ggplot(clean_happy) + geom_mosaic(aes(x = product(AGE), fill = HEALTH), na.rm = 
   ggtitle("Opinion of Health Between Ages") + xlab("Age") + ylab("Health")
 ```
 
-Yes, opinions of health chage as people get older. From observing the proportion of the "Poor" health opinion, we can see that it tends to increase as people age. Additionally, as people get older, the "Fair" health opinion increases by a decent amount, the "Good" health opinion decreases by a little amount, and the "Excellent" health opinion decreases by a significant amount. These trends are similar for both males and females; however, females tend to have slightly more "Poor" health opinions than males.
+Yes, opinions of health change as people get older. By observing the proportion of the "Poor" health opinion, we can see that it tends to increase as people age. Additionally, as people gets older, the "Fair" health opinion increases by a decent amount, the "Good" health opinion decreases by a little amount, and the "Excellent" health opinion decreases by a significant amount. These trends are similar for both males and females; however, females tend to have slightly more "Poor" health opinions than males.
