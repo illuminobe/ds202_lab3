@@ -1,0 +1,96 @@
+---
+title: 'Lab #3'
+author: "Kobe Pranivong; Yi Hang Khor"
+date: "2/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1: Extracting and Loading Data
+```{r}
+setwd("C:/Users/Kobe/Documents/DS202/ds202_lab3")
+library(dplyr)
+library(ggplot2)
+library(ggmosaic)
+HAPPY <- readxl::read_xls('C:/Users/Kobe/Documents/DS202/ds202_lab3/GSS.xls')
+```
+
+## Part 2: Exploration
+Use ggplot2 to create the plots. For each investigation, create an appropriate visualization. Write a paragraph to describe your findings, and the variables you used. You may want to rename the columns of the data frame for your convenience, using names(dat) <- c(...).
+```{r}
+# Cleaning up the data
+names(HAPPY) <- c('MARITAL', 'AGE', 'DEGREE', 'SEX', 'PARTYID', 'HAPPY', 'HEALTH', 'FINRELA', 'WTSSALL')
+HAPPY[HAPPY == "Don't know" | HAPPY == 'No answer' | HAPPY == 'Not applicable'] = NA
+clean_happy <- na.omit(HAPPY)
+clean_happy <- select(clean_happy, -WTSSALL) # We ended up not using this variable, so we dropped it
+clean_happy[clean_happy == '89 OR OLDER'] = 89
+clean_happy$AGE <- as.numeric(clean_happy$AGE)
+
+clean_happy <- clean_happy %>%
+  mutate(HAPPY = factor(HAPPY), AGE = as.numeric(AGE), SEX = factor(SEX), MARITAL = factor(MARITAL), DEGREE = factor(DEGREE), FINRELA = factor(FINRELA), HEALTH = factor(HEALTH), PARTYID = factor(PARTYID))
+head(clean_happy)
+```
+
+### 1. How does the happiness of a respondent relate to the marriage status?
+```{r}
+ggplot(clean_happy, aes(x = MARITAL, fill = HAPPY)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + xlab("Marital Status") + ylab("Total") + ggtitle("Happiness of Marital Status")
+```
+
+"Pretty happy" is the happiness level with the highest proportion in all marital statuses. "Married" is the most prevalent marital status, "Never married" comes in second, and "Separated" is the least prevalent. Respondents who are married have the highest proportion of "Very happy" happiness level. Divorced and Never married have very similar proportions of "Pretty happy" happiness level.
+
+### 2. Does the sex of the respondent affect the relationship you found in Q1?
+```{r}
+ggplot(clean_happy) + geom_mosaic(aes(x = product(MARITAL), fill = HAPPY), na.rm = TRUE) + facet_grid(.~SEX) + 
+  ggtitle("Happiness of Marital Status Between Sexes") + xlab("Marital Status") + ylab("Total") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+No, the sex of the respondent doesn't affect the relationship we found in Q1. For both sexes, the proportions of all happiness levels are
+basically the same. The only major difference we observed is males have a lot more respondents who identify as "Never married".
+
+### 3. How does the happiness of a respondent relate to the political party affiliation?
+```{r}
+ggplot(clean_happy, aes(x = PARTYID, fill = HAPPY)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+ggtitle("Influence of Political Views") + xlab("Political Party Affiliation") + ylab("Total")
+```
+
+Comparing the variable PARTYID to HAPPY, we found that those who identity as Not str democrat seem to have the largest distribution of happiness at "Pretty happy". The second PARTYID with the biggest distribution of happiness is Strong democrat at "Pretty happy". In this
+data set the repspondents are at the level of "Pretty happy" more than the others, and the PARTYID that is happier overall is Not str democrat and Strong democrat in both categories of Pretty happy" and "Very happy".
+
+### 4. Raise four questions that can be answered by the GSS dataset. Extract appropriate data from the website, explore, and answer the questions.
+(1) How does the opinion of income of a respondent relate to marital status? Does the happiness of the respondent affect this relationship?
+```{r}
+ggplot(clean_happy, aes(x=MARITAL, fill=FINRELA)) + geom_bar() + facet_wrap(~HAPPY) + xlab("Marital Status") + ylab("Total") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ggtitle("Marital and Financial Status")
+```
+
+The relationship between happiness, opinion of income and marital status is . We can see married people are most prevelant and have the most amount of pretty happy and very happy happiness levels. They also have mostly average to above average opinion of income; however, those who are widowed and considered very happy or pretty happy have mostly average.
+
+(2) What is the relationship between happiness and opinion of income? Is there a difference in this relationship between males and females?
+```{r}
+ggplot(clean_happy) + geom_mosaic(aes(x = product(HAPPY), fill = FINRELA), na.rm = TRUE) + facet_grid(.~SEX) + 
+  ggtitle("Happiness of Opinions of Income Between Sexes") + xlab("Happiness Level") +ylab("Opinion of Income") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+The relationship between happiness and opinion of income is: the happier the respondent is, the more likely they are to have a positive
+opinion of income. People who are pretty happy are the most prevalent and an average opinion of income is the most prevalent opinion. 
+People who are not too happy have the most amount of opinions of income that are below average or worse. There isn't a major difference
+in this relationship between males and females; however, females have slightly more negative opinions of income than males.
+
+(3) Does having a higher degree earned lead to more positive opinions of income?
+```{r}
+ggplot(clean_happy, aes(x = DEGREE, fill = FINRELA)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +   ggtitle("Opinion of Income of Different Degrees") + xlab("Highest Degree Earned") +ylab("Total")
+```
+
+Yes, we believe having a higher degree earned leads to a more positive opinion of income. As we reach a higher degree earned, the proportion of opinions that are below average or worse tends to get smaller. This is most likely due to those with a higher education being more aware and responsible of their financial situation.
+
+(4) Do opinions of personal health change as people get older? Is there a difference in opinions between males and females?
+```{r}
+ggplot(clean_happy) + geom_mosaic(aes(x = product(AGE), fill = HEALTH), na.rm = TRUE) + facet_wrap(~SEX) +
+  ggtitle("Opinion of Health Between Ages") + xlab("Age") + ylab("Health")
+```
+
+Yes, opinions of health chage as people get older. From observing the proportion of the "Poor" health opinion, we can see that it tends to increase as people age. Additionally, as people get older, the "Fair" health opinion increases by a decent amount, the "Good" health opinion decreases by a little amount, and the "Excellent" health opinion decreases by a significant amount. These trends are similar for both males and females; however, females tend to have slightly more "Poor" health opinions than males.
